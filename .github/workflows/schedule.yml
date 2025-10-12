@@ -8,8 +8,8 @@ on:
         required: false
         default: 'sushi'
   schedule:
-    - cron: "59 19 * * *"
-    - cron: "00 20 * * *"
+    - cron: "59 16 * * *"
+    - cron: "00 17 * * *"
 
 jobs:
 
@@ -30,7 +30,7 @@ jobs:
           node-version-file: .node-version
           cache: npm
           cache-dependency-path: package-lock.json
-      - run: echo '$GITHUB_WORKSPACE/cypress.env.json' > cypress.env.json
+      - run: echo '${{ secrets.CYPRESS_ENV }}' > cypress.env.json
         if: steps.last_status.outputs.last_status != 'success'
       - run: npm ci
         if: steps.last_status.outputs.last_status != 'success'
