@@ -8,8 +8,7 @@ on:
         required: false
         default: 'sushi'
   schedule:
-    - cron: "59 16 * * *"
-    - cron: "00 17 * * *"
+    - cron: "59 2,23 * * *"
 
 jobs:
 
@@ -34,5 +33,5 @@ jobs:
         if: steps.last_status.outputs.last_status != 'success'
       - run: npm ci
         if: steps.last_status.outputs.last_status != 'success'
-      - run: npm test
+      - run: npm run
     

@@ -64,7 +64,7 @@ describe('book reservation', () => {
 		cy.log(':mag: checking for days with openings...')
 		return cy
 			.get(tid('consumer-calendar-day'))
-			.filter('[aria-disabled=false].is-available')
+			.filter('[aria-disabled=false].is-available', { timeout: 60000 }) // retry for 60 seconds
 			.then((days) => cy.wrap(
 				days.filter((i, el) => 
 					reservation.excludedDays.length === 0 ||
@@ -157,6 +157,7 @@ describe('book reservation', () => {
 		visit()
 		closeTrusteModal()
 		authenticate()
+		cy.wait(30000) /// wait for 30 seconds
 		fetchAvailableDays().then((days) => {
 			cy.log(`:raised_hands: found ${days.length} days available for booking...`)
 			return findMatchingTimeSlot(Array.from(days))
