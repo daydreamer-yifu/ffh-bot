@@ -54,17 +54,17 @@ describe('book reservation', () => {
 
 	function closeTrusteModal() {
 		if (!Cypress.env('trustee')) return
-		cy.log(':cookie: closing truste modal...')
+		cy.task('log', ':cookie: closing truste modal...')
 		return cy
 			.get('#truste-consent-required')
 			.click() 
 	}
 
 	function fetchAvailableDays() {
-		cy.log(':mag: checking for days with openings...')
+		cy.task('log', ':mag: checking for days with openings...')
 		return cy
 			.get(tid('consumer-calendar-day'))
-			.filter('[aria-disabled=false].is-available', { timeout: 60000 }) // retry for 60 seconds
+			.filter('[aria-disabled=false].is-available', { timeout: 300000 }) // retry for 300 seconds
 			.then((days) => cy.wrap(
 				days.filter((i, el) => 
 					reservation.excludedDays.length === 0 ||
@@ -96,10 +96,10 @@ describe('book reservation', () => {
 	}
 
 	function authenticate() {
-		cy.log(':house: navigating to booking page...')
+		cy.task('log', ':house: navigating to booking page...')
 		cy.get(tid('email-input')).type(patron.email)
 		cy.get(tid('password-input')).type(patron.password)
-		cy.log(':unlock: logging in...')
+		cy.task('log', ':unlock: logging in...')
 		cy.get(tid('signin')).click()
 	}
 
@@ -113,7 +113,7 @@ describe('book reservation', () => {
 		return cy.get('.Consumer-contentContainer').then((body) => {
 			const root = body.find('span#cvv')
 			if (root.length) {
-				cy.log(':credit_card: completing payment form...')
+				cy.task('log', ':credit_card: completing payment form...')
 				cy.intercept('https://payments.braintree-api.com/graphql').as('braintree')
 				cy.wait('@braintree')
 				cy.get('iframe[type=cvv]')
@@ -121,14 +121,14 @@ describe('book reservation', () => {
 					.find('#cvv')
 					.type(patron.cvv)
 			} else {
-				cy.log(':money_with_wings: no deposit required...')	
+				cy.task('log', ':money_with_wings: no deposit required...')	
 			}
 			return cy.wrap(root.length > 0)
 		})
 	}
 
 	function submitBooking() {
-		cy.log(':handshake: booking reservation...')
+		cy.task('log', ':handshake: booking reservation...')
 		if (reservation.dryRun) {
 			return cy.wrap('not booked, dry run mode enabled...')
 		} else {		
@@ -157,7 +157,6 @@ describe('book reservation', () => {
 		visit()
 		closeTrusteModal()
 		authenticate()
-		cy.wait(30000) /// wait for 30 seconds
 		fetchAvailableDays().then((days) => {
 			cy.log(`:raised_hands: found ${days.length} days available for booking...`)
 			return findMatchingTimeSlot(Array.from(days))
